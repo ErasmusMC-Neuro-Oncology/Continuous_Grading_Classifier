@@ -22,3 +22,4 @@ Continuous Grading Coefficient: Astrocytoma continuous grading coefficient deriv
 
 URL: <https://erasmusmc-neuro-oncology.github.io/Continuous_Grading_Classifier/>
 
+URL CGCψ: <https://github.com/ErasmusMC-Neuro-Oncology/Continuous_Grading_Classifier/blob/main/CGC-Phi.R/>
