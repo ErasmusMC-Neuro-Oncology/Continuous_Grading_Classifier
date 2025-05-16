@@ -1,6 +1,13 @@
 #!/usr/bin/env R
 
 # This scripts attempts to determine the CGC independent of the (astrocytoma) classification process
+# The predictors are glmnet models exported to Rds format
+
+# 0. config and dependencies
+
+# install:
+# - minfi
+# - glmnet
 
 
 idat_grn <- 'tmp/201496850071_R02C01_Grn.idat'
@@ -39,27 +46,47 @@ mvalue <- minfi::ratioConvert(proc, what = "M") |>
 # 2. load predictor ----
 
 
-predictor <- readRDS("assets/LGC_predictor_probe_based_lm.Rds")
+predictor_850k <- readRDS("assets/LGC_predictor_probe_based_lm.Rds")
+predictor_450k <- readRDS("assets/LGC_predictor_probe_based_lm_450k.Rds")
 
 
 
+# 3a. apply to 850k arrays ----
 
-# 3. apply ----
-
-# select target probes
+# select appropriate target probes
 data <- mvalue |> 
   tibble::column_to_rownames('probe_id') |> 
   t() |> 
   as.data.frame() |> 
-  dplyr::select(rownames(predictor$beta)) |> 
-  #t() |> 
+  dplyr::select(rownames(predictor_850k$beta)) |> 
   as.matrix()
 
 
 # apply lm
-out <- glmnet::predict.glmnet(predictor, data) |> 
+out <- glmnet::predict.glmnet(predictor_850k, data) |> 
   as.data.frame() |> 
-  dplyr::rename(`CGC[Ac]` = 1)
+  dplyr::rename(`CGCψ` = 1)
+
+
+out
+
+
+
+# 3b. apply to 450k arrays ----
+
+# select appropriate target probes
+data <- mvalue |> 
+  tibble::column_to_rownames('probe_id') |> 
+  t() |> 
+  as.data.frame() |> 
+  dplyr::select(rownames(predictor_450k$beta)) |> 
+  as.matrix()
+
+
+# apply lm
+out <- glmnet::predict.glmnet(predictor_450k, data) |> 
+  as.data.frame() |> 
+  dplyr::rename(`CGCψ450k` = 1)
 
 
 out
