@@ -8,6 +8,7 @@
 # install:
 # - minfi
 # - IlluminaHumanMethylationEPICmanifest
+# - IlluminaHumanMethylationEPICanno.ilm10b4.hg19
 # - glmnet
 
 
