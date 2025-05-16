@@ -7,6 +7,7 @@
 
 # install:
 # - minfi
+# - IlluminaHumanMethylationEPICmanifest
 # - glmnet
 
 
