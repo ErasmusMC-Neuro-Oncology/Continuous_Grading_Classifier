@@ -9,13 +9,19 @@
 # - minfi
 # - IlluminaHumanMethylationEPICmanifest
 # - IlluminaHumanMethylationEPICanno.ilm10b4.hg19
+# - IlluminaHumanMethylationEPICv2manifest
+# - IlluminaHumanMethylationEPICv2anno.20a1.hg38
 # - glmnet
 
+
+# only thing needed to configure:
 
 idat_grn <- 'tmp/201496850071_R02C01_Grn.idat'
 idat_red <- 'tmp/201496850071_R02C01_Red.idat'
 array_sentrix_id <- gsub("^.+/([^/]+)_(Grn|Red).idat$","\\1", idat_grn)
 
+
+# then run code below :)
 
 
 # 1. load M-values ----
@@ -48,50 +54,46 @@ mvalue <- minfi::ratioConvert(proc, what = "M") |>
 # 2. load predictor ----
 
 
-predictor_850k <- readRDS("assets/LGC_predictor_probe_based_lm.Rds")
-predictor_450k <- readRDS("assets/LGC_predictor_probe_based_lm_450k.Rds")
+predictor_epicv2 <- readRDS("assets/CGCy_predictor_probe_based_lm_epicv2.Rds") # a.k.a. 950k
+predictor_epicv1 <- readRDS("assets/CGCy_predictor_probe_based_lm.Rds") # a.k.a. 850k
+predictor_450k   <- readRDS("assets/CGCy_predictor_probe_based_lm_450k.Rds")
+
+
+if(annotation(RGSet)[1] == "IlluminaHumanMethylationEPICv2") {
+  predictor <- predictor_epicv2
+  suffix <- "_epicv2"
+} else if (annotation(RGSet)[1] == "IlluminaHumanMethylation450k") {
+  predictor <- predictor_450k
+  suffix <- "_450k"
+} else if (annotation(RGSet)[1] == "IlluminaHumanMethylationEPIC") {
+  predictor <- predictor_epicv1
+  suffix <- ""
+}
 
 
 
-# 3a. apply to 850k arrays ----
+# 3. apply to array ----
 
-# select appropriate target probes
+
+# acquire the exact same m-values
 data <- mvalue |> 
   tibble::column_to_rownames('probe_id') |> 
   t() |> 
   as.data.frame() |> 
-  dplyr::select(rownames(predictor_850k$beta)) |> 
+  dplyr::select(rownames(predictor$beta)) |> 
   as.matrix()
 
 
-# apply lm
-out <- glmnet::predict.glmnet(predictor_850k, data) |> 
+# apply lm to the data
+out <- glmnet::predict.glmnet(predictor, data) |> 
   as.data.frame() |> 
-  dplyr::rename(`CGCψ` = 1)
+  dplyr::rename(`CGCψ` = 1) |> 
+  dplyr::rename_with(.fn = ~ paste0(., suffix), .cols = c('CGCψ'))
+
 
 
 out
 
-
-
-# 3b. apply to 450k arrays ----
-
-# select appropriate target probes
-data <- mvalue |> 
-  tibble::column_to_rownames('probe_id') |> 
-  t() |> 
-  as.data.frame() |> 
-  dplyr::select(rownames(predictor_450k$beta)) |> 
-  as.matrix()
-
-
-# apply lm
-out <- glmnet::predict.glmnet(predictor_450k, data) |> 
-  as.data.frame() |> 
-  dplyr::rename(`CGCψ450k` = 1)
-
-
-out
 
 
 
