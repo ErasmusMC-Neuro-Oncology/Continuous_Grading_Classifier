@@ -54,9 +54,9 @@ mvalue <- minfi::ratioConvert(proc, what = "M") |>
 # 2. load predictor ----
 
 
-predictor_epicv2 <- readRDS("assets/CGCy_predictor_probe_based_lm_epicv2.Rds") # a.k.a. 950k
-predictor_epicv1 <- readRDS("assets/CGCy_predictor_probe_based_lm.Rds") # a.k.a. 850k
-predictor_450k   <- readRDS("assets/CGCy_predictor_probe_based_lm_450k.Rds")
+predictor_epicv2 <- readRDS("assets/CGC-Psi_predictor_probe_based_lm_v1.0_epicv2.Rds") # a.k.a. 950k
+predictor_epicv1 <- readRDS("assets/CGC-Psi_predictor_probe_based_lm_v1.0_epic.Rds") # a.k.a. 850k
+predictor_450k   <- readRDS("assets/CGC-Psi_predictor_probe_based_lm_v1.0_450k.Rds")
 
 
 if(annotation(RGSet)[1] == "IlluminaHumanMethylationEPICv2") {
